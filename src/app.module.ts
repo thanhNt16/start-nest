@@ -5,21 +5,24 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/user.entity';
+import { Task } from './tasks/task.entity';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
+      port: 5432,
+      username: 'postgres',
+      password: 'postgres',
       database: 'test',
-      entities: [User],
+      entities: [User, Task],
       autoLoadEntities: true,
       synchronize: true,
     }),
     AuthModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

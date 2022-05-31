@@ -10,7 +10,6 @@ import { AuthCredentialsDTO } from './dto/auth-credential.dto';
 import { User } from './user.entity';
 
 @ApiTags('auth')
-@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

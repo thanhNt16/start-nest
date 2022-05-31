@@ -18,6 +18,7 @@ async function bootstrap() {
     .setDescription('The startup API description')
     .setVersion('1.0')
     .addTag('auth')
+    .addTag('tasks')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
