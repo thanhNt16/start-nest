@@ -1,31 +1,30 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { getConnectionOptions, Connection } from 'typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { User } from './auth/user.entity';
-import { TasksModule } from './tasks/tasks.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { User, UserSchema } from './models/user.model';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { JwtStrategy } from './auth/jwt.strategy';
+import { UserModule } from './user/user.module';
+const passportModule = PassportModule.register({ defaultStrategy: 'jwt' });
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'test',
-      entities: [User, Task],
-      autoLoadEntities: true,
-      synchronize: true,
+    MongooseModule.forRoot(
+      'mongodb+srv://thanhnt6198:thanhnt6198@cluster0.gxg2kec.mongodb.net/?retryWrites=true&w=majority',
+    ),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    passportModule,
+    JwtModule.register({
+      secret: 'secret',
+      signOptions: { expiresIn: '60s' },
     }),
-    AuthModule,
-    TasksModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [UserController, AuthController],
+  providers: [UserService, AuthService, JwtStrategy],
+  exports: [passportModule],
 })
-export class AppModule {
-  constructor(private connection: Connection) {}
-}
+export class AppModule {}

@@ -1,27 +1,26 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthCredentialsDTO } from './dto/auth-credential.dto';
-import { User } from './user.entity';
+import { User } from '../models/user.model';
+import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
-  @Post('/signup')
-  signUp(@Body() authCredentialsDto: AuthCredentialsDTO): Promise<void> {
-    return this.authService.signUp(authCredentialsDto);
+  constructor(private readonly authService: AuthService) {}
+  @Post('register')
+  async register(@Body() user: User): Promise<{ access_token: string }> {
+    const createdUser = await this.authService.register(user);
+    const access_token = await this.authService.login(createdUser);
+    return { access_token };
   }
 
-  @Post('/signin')
-  signIn(
-    @Body() authCredentialsDto: AuthCredentialsDTO,
-  ): Promise<{ accessToken: string }> {
-    return this.authService.signIn(authCredentialsDto);
+  @Post('login')
+  async login(@Body() user: User): Promise<{ access_token: string }> {
+    const foundUser = await this.authService.validateUser(
+      user.email,
+      user.password,
+    );
+    const access_token = await this.authService.login(foundUser);
+    return { access_token };
   }
 }
